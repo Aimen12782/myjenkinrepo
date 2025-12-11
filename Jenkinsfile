@@ -2,22 +2,25 @@ pipeline {
     agent any
 
     stages {
-        stage('Build') {
+        stage('Pull Code') {
             steps {
-                echo "No build required for HTML site."
-            }
-        }
-
-        stage('Test') {
-            steps {
-                echo "Testing not required for static HTML site."
+                echo "Pulling latest code from GitHub..."
+                git branch: 'main',
+                    url: 'https://github.com/Aimen12782/myjenkinrepo.git',
+                    credentialsId: 'YOUR_GITHUB_CREDENTIALS_ID'
             }
         }
 
         stage('Deploy') {
             steps {
-                echo "Deployment step..."
-                bat "xcopy /E /I /Y index.html C:\\deploy-folder\\"
+                echo "Deploying website to Nginx..."
+                
+                // Copy all files to Nginx root folder
+                sh '''
+                sudo cp -r * /var/www/html/
+                sudo chown -R www-data:www-data /var/www/html/
+                sudo systemctl reload nginx
+                '''
             }
         }
     }
